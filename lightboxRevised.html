@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>lightbox</title>
+    <style type="text/css">
+        /*BEGIN SLIDER STYLES*/
+        
+        
+        #slider {
+  position: relative;
+  overflow: hidden;
+  margin: 20px auto 0 auto;
+  border-radius: 25px;
+            top: 0;
+}
+
+#slider ul {
+  position: relative;
+  margin: 0;
+  padding: 0;
+  height: 884px;
+  list-style: none;
+
+}
+
+#slider ul li {
+  position: relative;
+  display: block;
+  float: left;
+  width: 500px;
+  height: 884px;
+  background: #ccc;
+  text-align: center;
+  line-height: 300px;
+
+}
+a.control_prev, a.control_next {
+  position: absolute;
+  top: 40%;
+  z-index: 999;
+  display: block;
+  padding: 2% 1%;
+  width: auto;
+  height: auto;
+  background: black;
+  color: white;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 100px;
+  opacity: 0.3;
+  cursor: pointer;
+}
+
+a.control_prev:hover, a.control_next:hover {
+  opacity: .8;
+  -webkit-transition: all 0.2s ease;
+  transition: all 0.2s ease;
+    
+}
+
+a.control_prev {
+  border-radius: 0 25px 25px 0;
+}
+
+a.control_next {
+  right: 0;
+  border-radius: 25px 0px 0px 25px;
+}
+        /*END SLIDER STYLES*/
+        .overlay {
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+        .big {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            -webkit-transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%);
+        }
+        p {
+            display: inline-block;
+        }
+        #lb,
+        #rb {
+            color: white;
+            font-size: 40px;
+            width: 30px;
+            height: 50px;
+            background-color: rgba(0, 0, 0, 0.5);
+            cursor: pointer;
+            text-align: center;
+        }
+        #lb {
+            float: left;
+        }
+        #rb {
+            float: right;
+        }
+        #controls {
+            /*background-color:red;*/
+            z-index: 1000;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            -webkit-transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%);
+        }
+    </style>
+    <script type="text/javascript" src="jquery-1.11.1.js"></script>
+    <script type="text/javascript">
+        
+        /*BEGIN SLIDER*/
+        
+        $(document).ready(function(){
+
+	var slideCount = $('#slider ul li').length;
+	var slideWidth = $('#slider ul li').width();
+	var slideHeight = $('#slider ul li').height();
+	var sliderUlWidth = slideCount * slideWidth;
+	
+	$('#slider').css({ width: slideWidth, height: slideHeight });
+	
+	$('#slider ul').css({ width: sliderUlWidth, marginLeft: - slideWidth });
+	
+    //move the last image to the left of the first image so if the user selects move right it will work
+    $('#slider ul li:last-child').prependTo('#slider ul');
+
+    function moveLeft() {
+        $('#slider ul').animate({
+            left: +slideWidth//"+=" +slideWidth+"px"
+        }, 2000, function () {
+            $('#slider ul li:last-child').prependTo('#slider ul');
+            $('#slider ul').css('left', '0px');
+        });
+        console.log($('#slider ul').css('left'));
+    };
+
+    function moveRight() {
+        $('#slider ul').animate({
+            left: -slideWidth//"-=" +slideWidth+"px"
+        }, 2000, function () {
+            $('#slider ul li:first-child').appendTo('#slider ul');
+            $('#slider ul').css('left', '0px');
+        });
+        resetTimer();
+    };
+   $('a.control_prev').click(function () {
+        moveLeft();
+        resetTimer();
+    });
+
+    $('a.control_next').click(function () {
+        moveRight();
+        resetTimer();
+    });
+
+    var slideTimer;
+
+    function resetTimer(){
+    	window.clearTimeout(slideTimer);
+    	slideTimer = window.setTimeout(moveRight, 5000);
+    }
+    resetTimer();
+
+});
+        
+        /*END SLIDER*/
+        
+        $(document).ready(function () {
+            $('#slideshow').append('<div class="overlay"></div>');
+            $('.overlay').append('<div id = "controls"></div>');
+            $('#controls').append('<div id = "lb">&lsaquo;</div>');
+            $('#controls').append('<div id = "rb">&rsaquo;</div>');
+            //need to make sure z-index of controls keeps it on top
+            $('.overlay').hide();
+
+            $('#lb').hover(
+                function () {
+                    $(this).css('background-color', 'rgba(255,255,255,0.5)')
+                },
+                function () {
+                    $(this).css('background-color', 'rgba(0,0,0,0.5)')
+                }
+            ); //end left hover
+            $('#rb').hover(
+                function () {
+                    $(this).css('background-color', 'rgba(255,255,255,0.5)')
+                },
+                function () {
+                    $(this).css('background-color', 'rgba(0,0,0,0.5)')
+                }
+            ); //end right hover
+
+            var pathList = [];
+            var totalImages = $('#slideshow img').length; //length is jquery method to count items
+            for (var i = 0; i < totalImages; i++) {
+                pathList[i] = $('#slideshow a:eq(' + i + ')').attr('href');
+                //eq starts counting at 0 and selects items on the DOM tree viewing siblings as countable array like items
+            };
+            console.log(pathList);
+
+            var imageBig;
+            var currentImageNumber;
+
+            $('p.pic').click(function (e) {
+                e.preventDefault();
+
+                var imagePath = $(this).children('a').attr('href');
+                var imageMarkup = '<img src ="' + imagePath + '" class = "big">';
+
+                $('.overlay').append(imageMarkup);
+                imageBig = $('.overlay').children('img'); //new. added tag selector for clarity
+
+                //the next section is about centering the image and resizing it for different screens
+                //using load to obtain data about loaded image
+                //without waiting for load to complete the h and w register 0
+                $(imageBig).load(function () {
+                    $(imageBig).css('width',""); //reset the image width
+                    $(imageBig).css('height',"");//reset the image height
+
+                    var cHeight = $(imageBig).parent(".overlay").height();
+                    var cWidth = (imageBig).parent(".overlay").width();
+                    var iHeight = $(imageBig).height();
+                    var iWidth = $(imageBig).width();
+                    var ratio = 1;
+                    //new
+                    var newHeight;
+                    var newWidth;
+
+                    var ratio = 1;
+                    if (iHeight > iWidth){
+                        console.log("image is portrait");
+                        ratio = cHeight/iHeight;
+                        newHeight = cHeight*0.9;
+                        newWidth = iWidth*ratio;
+                        if (newWidth>cWidth*0.9){
+                            ratio = cWidth/newWidth;
+                            newWidth = cWidth*0.9;
+                            newHeight *= ratio;
+                        }
+                    }else if (iHeight < iWidth){
+                        console.log("image is landscape");
+                        ratio = cWidth/iWidth;
+                        newHeight = iHeight*ratio;
+                        newWidth = cWidth*0.9;
+                        if (newHeight>cHeight*0.9){
+                            ratio = cHeight/newHeight;
+                            newHeight = cHeight*0.9;
+                            newWidth *= ratio;
+                        }
+                    }else{
+                        console.log("Something is not right with the code.")
+                    }
+                    $(imageBig).css({
+                        height:newHeight,
+                        width:newWidth
+                    });
+
+                   $('.overlay').css({
+                        top: $('body').scrollTop()
+                    });
+
+                    //positioning the controls
+                    //using the imageBig info to place the controls correctly
+                    //update to use the new variable newWidth
+                    $('#controls').css('width', newWidth);
+                    $('#controls').css('height', 100);
+
+                }); //imageBig load end
+
+                $('.overlay').fadeIn('slow');
+                $('#lb').show();
+                $('#rb').show();
+
+            }); //end paragraph thumbnail click open
+
+            $('#lb').click(function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                currentImageNumber = pathList.indexOf($(imageBig).attr('src'));
+                currentImageNumber--;
+                if (currentImageNumber >= 0) {
+                    $(imageBig).attr('src', pathList[currentImageNumber]);
+                } else {
+                    clearBig();
+                }
+
+            }); //end left click
+            $('#rb').click(function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                currentImageNumber = pathList.indexOf($(imageBig).attr('src'));
+                currentImageNumber++;
+                if (currentImageNumber < totalImages) {
+                    $(imageBig).attr('src', pathList[currentImageNumber]);
+                } else {
+                    clearBig();
+                }
+            }); //end right click
+
+
+            //needs to be in this function or it doesn't exist yet so it fails to do anything
+            $('.overlay').click(function (e) {
+                clearBig(); //made new function since I needed it 2 times
+            }); //end click close
+
+            function clearBig() {
+                $('.overlay').fadeOut('slow', function () {
+                    $('.overlay img').remove();
+                    $('.overlay').hide();
+                }); //end fadeout
+                console.log("bye");
+            }
+        }); //end ready
+    </script>
+</head>
+
+<body>
+    <div id="slideshow">
+        <section id="slider">
+<!--
+  <a href="#" class="control_next">></a>
+  <a href="#" class="control_prev"><</a>
+-->
+<ul>
+    <li><p class="pic"><a href="scene1.jpg" title="fred is a goofball."><img src="scene1.jpg"></a></p></li>
+    
+	<li><p class="pic"><a href="scene2.jpg" title="fred is a goofball."><img src="scene2.jpg"></a></p></li>
+    
+    <li><p class="pic"><a href="scene3.jpg" title="fred is a goofball."><img src="scene3.jpg"></a></p></li>
+
+            </ul>
+      </section>
+        </div>
+<!--
+</div>
+    <div id="slideshow">
+        <p class="pic">
+            <a href="scene1.jpg" title="fred is a goofball.">
+                <img src="face_thumb.jpg">
+            </a>
+        </p>
+        <p class="pic">
+            <a href="scene2.jpg" title="shaggy is always hungry.">
+                <img src="face2_thumb.jpg">
+            </a>
+        </p>
+        <p class="pic">
+            <a href="scene3.jpg" title="scooby is not a dog.">
+                <img src="face3_thumb.jpg">
+            </a>
+        </p>
+    </div>
+-->
+
+</body>
+
+</html>
