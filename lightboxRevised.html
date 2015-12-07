@@ -4,22 +4,64 @@
 <head>
     <title>lightbox</title>
     <style type="text/css">
-        /*BEGIN SLIDER STYLES*/
         
+/*PAGE STYLES*/
         
-        #slider {
+body{
+    background-color: rgb(92, 92, 92);
+    background-image: url('slidebg.png');
+    background-repeat: no-repeat;
+    background-position: bottom left;
+    background-size: contain;
+}
+        
+h1{
+    text-align: center;
+    font-family: verdana;
+    color: #fff;
+    font-size: 50px;
+}
+        
+    h2{
+    text-align: center;
+    font-family: verdana;
+    color: #40ba94;
+    font-size: 33px;
+    line-height: 0px;
+}
+        
+@media only screen and (max-width: 580px) {
+    
+    h1{
+        font-size: 40px;
+    }
+    
+    h2{
+        font-size: 27px;
+    }
+
+ 
+}
+        
+
+/*BEGIN SLIDER STYLES*/
+        
+#slider {
   position: relative;
   overflow: hidden;
-  margin: 20px auto 0 auto;
+  margin: 50px auto 0 auto;
   border-radius: 25px;
             top: 0;
+
+
+  
 }
 
 #slider ul {
   position: relative;
   margin: 0;
   padding: 0;
-  height: 884px;
+  height: 530px;
   list-style: none;
 
 }
@@ -28,8 +70,8 @@
   position: relative;
   display: block;
   float: left;
-  width: 500px;
-  height: 884px;
+  width: 300px;
+  height: 530px;
   background: #ccc;
   text-align: center;
   line-height: 300px;
@@ -75,6 +117,7 @@ a.control_next {
             position: absolute;
             left: 0;
             top: 0;
+            z-index: 1001;
         }
         .big {
             position: absolute;
@@ -82,6 +125,7 @@ a.control_next {
             left: 50%;
             -webkit-transform: translate(-50%, -50%);
             transform: translate(-50%, -50%);
+            z-index: 1002;
         }
         p {
             display: inline-block;
@@ -104,7 +148,7 @@ a.control_next {
         }
         #controls {
             /*background-color:red;*/
-            z-index: 1000;
+            z-index: 1500;
             position: absolute;
             top: 50%;
             left: 50%;
@@ -114,6 +158,7 @@ a.control_next {
     </style>
     <script type="text/javascript" src="jquery-1.11.1.js"></script>
     <script type="text/javascript">
+        
         
         /*BEGIN SLIDER*/
         
@@ -322,18 +367,22 @@ a.control_next {
 </head>
 
 <body>
+    <h1>North Shore</h1>
+    <h2>Grand Marais, MN</h2>
     <div id="slideshow">
         <section id="slider">
+
 <!--
   <a href="#" class="control_next">></a>
   <a href="#" class="control_prev"><</a>
 -->
+
 <ul>
-    <li><p class="pic"><a href="scene1.jpg" title="fred is a goofball."><img src="scene1.jpg"></a></p></li>
+    <li><p class="pic"><a href="scene1.jpg" title="North Shore"><img src="scene1_thumb.jpg"></a></p></li>
     
-	<li><p class="pic"><a href="scene2.jpg" title="fred is a goofball."><img src="scene2.jpg"></a></p></li>
+	<li><p class="pic"><a href="scene2.jpg" title="North Shore Sunset"><img src="scene2_thumb.jpg"></a></p></li>
     
-    <li><p class="pic"><a href="scene3.jpg" title="fred is a goofball."><img src="scene3.jpg"></a></p></li>
+    <li><p class="pic"><a href="scene3.jpg" title="Lake Superior"><img src="scene3_thumb.jpg"></a></p></li>
 
             </ul>
       </section>
